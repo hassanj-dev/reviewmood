@@ -99,7 +99,7 @@ div[data-baseweb="select"]>div{border-radius:10px;border-color:#F0D5CA;backgroun
 .rw .tm{font-size:11.5px;color:var(--mute);text-align:right;}
 @media(max-width:900px){.mr{grid-template-columns:100px 1fr 46px;}.rw{grid-template-columns:42px 1fr;}.rw .tm{display:none;}}
 /* about */
-.about{background:linear-gradient(135deg,#FF5A1F,#FF8A5B);border-radius:20px;padding:26px 30px;color:#fff;display:grid;grid-template-columns:1.25fr 1fr;gap:28px;margin-bottom:18px;}
+.about{background:linear-gradient(135deg,#FF5A1F,#FF8A5B);border-radius:20px;padding:26px 30px;color:#fff;display:grid;grid-template-columns:1.25fr 1fr;gap:28px;margin:28px 0 0;}
 .about h2{font-size:24px;font-weight:600;margin:0 0 10px;line-height:1.25;color:#fff;}
 .about p{font-size:13.5px;line-height:1.65;margin:0 0 10px;color:rgba(255,255,255,.93);}
 .about .nb{font-size:12px;color:rgba(255,255,255,.85);}
@@ -200,9 +200,9 @@ if "history" not in st.session_state:
 
 # ----------------------------------------------------------------- sidebar
 with st.sidebar:
-    nav = [("home", "Dashboard", "top", True), ("file", "About", "about", False), ("edit", "Analyze review", "analyze", False),
+    nav = [("home", "Dashboard", "top", True), ("edit", "Analyze review", "analyze", False),
            ("grid", "Confusion matrix", "matrix", False), ("bar", "Performance", "perf", False),
-           ("star", "Top words", "words", False), ("clock", "Recent", "recent", False)]
+           ("star", "Top words", "words", False), ("clock", "Recent", "recent", False), ("file", "About us", "about", False)]
     items = "".join(f'<a class="{"on" if on else ""}" href="#{a}">{icon(i)}{n}</a>' for i, n, a, on in nav)
     bp = M["search"]["best_params"]
     st.markdown(f"""<div class="brand"><div class="mark">🎬</div>REVIEWMOOD</div>
@@ -220,21 +220,6 @@ main, side = st.columns([3.3, 1], gap="medium")
 
 # ================================================================= MAIN
 with main:
-    st.markdown(f"""<div class="about" id="about"><div>
-      <h2>What is ReviewMood?</h2>
-      <p>ReviewMood is a movie-review sentiment analyzer. Paste any English movie review and it tells you
-      whether the writer felt <b>positive</b> or <b>negative</b>, with a confidence score.</p>
-      <p>It was trained on the IMDB 50K reviews dataset ({M['eda']['n_rows_used']:,} unique reviews after removing duplicates)
-      and tested on {M['n_test']:,} reviews it had never seen, where it is right about
-      {M['test_accuracy']:.0%} of the time.</p>
-      <div class="nb">Good to know: it reads written English film reviews. Sarcasm, mixed opinions and other
-      topics (products, news) can fool it.</div></div>
-      <div class="steps">
-        <div class="st1"><i>1</i><div><b>Clean the text</b><span>Lowercase, remove punctuation, numbers and filler words, reduce words to their base form.</span></div></div>
-        <div class="st1"><i>2</i><div><b>Turn words into numbers</b><span>TF-IDF scores the {M['tfidf_params']['max_features']:,} most useful words and word pairs.</span></div></div>
-        <div class="st1"><i>3</i><div><b>Vote with {M['search']['best_params']['n_estimators']} decision trees</b><span>A Random Forest combines the trees' votes into one prediction.</span></div></div>
-      </div></div>""", unsafe_allow_html=True)
-
     sup = [rep[c]["support"] for c in class_names]
     base = max(sup) / sum(sup)
     gain = (M["test_accuracy"] - base) * 100
@@ -346,3 +331,19 @@ with side:
         cards += (f'<div class="tp"><div class="av">{"😊" if pos else "😞"}</div><b>{html.escape(f["feature"])}</b>'
                   f'<div class="rl">Leans {f["leans"]}</div>{pill}{"↑" if pos else "↓"} {f["importance"]/mx*100:.0f} score</span></div>')
     st.markdown(f'<div class="twg">{cards}</div>', unsafe_allow_html=True)
+
+# ================================================================= ABOUT US (bottom)
+st.markdown(f"""<div class="about" id="about"><div>
+  <h2>About us: what is ReviewMood?</h2>
+  <p>ReviewMood is a movie-review sentiment analyzer. Paste any English movie review and it tells you
+  whether the writer felt <b>positive</b> or <b>negative</b>, with a confidence score.</p>
+  <p>It was trained on the IMDB 50K reviews dataset ({M['eda']['n_rows_used']:,} unique reviews after removing duplicates)
+  and tested on {M['n_test']:,} reviews it had never seen, where it is right about
+  {M['test_accuracy']:.0%} of the time.</p>
+  <div class="nb">Good to know: it reads written English film reviews. Sarcasm, mixed opinions and other
+  topics (products, news) can fool it.</div></div>
+  <div class="steps">
+    <div class="st1"><i>1</i><div><b>Clean the text</b><span>Lowercase, remove punctuation, numbers and filler words, reduce words to their base form.</span></div></div>
+    <div class="st1"><i>2</i><div><b>Turn words into numbers</b><span>TF-IDF scores the {M['tfidf_params']['max_features']:,} most useful words and word pairs.</span></div></div>
+    <div class="st1"><i>3</i><div><b>Vote with {M['search']['best_params']['n_estimators']} decision trees</b><span>A Random Forest combines the trees' votes into one prediction.</span></div></div>
+  </div></div>""", unsafe_allow_html=True)
